@@ -151,27 +151,45 @@ class BeliefNetwork:
         self.nodes = nodes
     
     def __str__(self):
+        """
+        ASCII art version of network. 
+        """
+
         pass
     
     def sample(self, bindings=None):
         #Cascade of sampling, resulting in an entire record
         
         #Acquire nodes sorted in topological order
-        sorted_nodes = None
+        sorted_nodes = self.nodes
 
         nodes_to_value = {}
 
-        for n in sorted_nodes:        
+        for n in sorted_nodes:
+            logger.info("nodes_to_value: %s" % nodes_to_value)
+
+            logger.info("Getting sample for %s" % n.id)
+
             #Determine value of parent nodes
-            parent_ids = n.parents
+            #-------------------------------
+            parent_ids = [p.id for p in n.parents]
+
+            logger.info("Parents: %s" % ",".join(parent_ids))
 
             parent_node_vals = {}
+            
             for p in parent_ids:
                 parent_node_vals[p] = nodes_to_value[p]
+            #-------------------------------
 
             #Acquire value for this node
             sampled_value = n.sample(parent_node_vals)
+
+            logger.info("sampled value for %s: %s" % (n.id, sampled_value))
+
             nodes_to_value[n.id] = sampled_value
+        
+        return nodes_to_value
     
     def evaluate(self, bindings):
         pass
@@ -207,7 +225,7 @@ def test_data():
     # nodeE.cpt = None
     #-------------------
 
-    nodes = [nodeA, nodeB, nodeC, nodeD, nodeE]
+    nodes = [nodeA, nodeB, nodeE, nodeC, nodeD]
 
     for n in nodes:
         n.init_cpt()
