@@ -72,7 +72,9 @@ class Node:
         
         if len(self.parents)>0:
 
-            logger.info("parents: %s" % ",".join([str(p) for p in self.parents]) )
+            logger.info("# parents: %s" % str(len(self.parents)))
+            
+            logger.info("parents: %s" % ",".join([str(p.id) for p in self.parents]) )
             
             #Acquire appropriate CPT entry
             #-----------------------------
@@ -84,8 +86,13 @@ class Node:
             for p in parent_var_names_in_order:
                 bindings_as_list.append(parent_bindings[p])
 
+            
+            logger.info("bindings_as_list: %s" % bindings_as_list)
+
             bindings_as_tuple = tuple(bindings_as_list)
             
+            logger.info("bindings_as_tuple: %s", str(bindings_as_tuple) )
+
             cpt_entry = self.cpt[bindings_as_tuple]
             
             logger.info("Retrieved cpt entry: %s" % cpt_entry)
@@ -93,22 +100,43 @@ class Node:
             
             #Sample retrieved distribution
             #-----------------------------
-            # rand_num = random.random()
+            rand_num = random.random()
 
-            # acc_prob = rand_num
-            # for v in self.values:
-            #     if None:
-            #         pass
+            acc_prob = 0
+            #for v in self.values:
+            for i in range(len(cpt_entry)):
                 
-            #     acc_prob+=distr_for_bindings[v]
+                var_name = self.values[i]
+                val_prob = cpt_entry[i]
+                
+                acc_prob+=val_prob
+
+                if acc_prob>=rand_num:
+                    sample_value = var_name
+                    break
             
-            # sample_value = None
             #-----------------------------
         else:
-            cpt_entry = self.cpt[ self.cpt.keys()[0] ]
+            logger.info("# parents: 0")
 
             #Acquire the only CPT entry
-            sample_value = None
+            cpt_entry = self.cpt[ self.cpt.keys()[0] ]
+
+            logger.info("Retrieved CPT entry: %s" % cpt_entry)
+
+            rand_num = random.random()
+
+            acc_prob = 0
+            for i in range(len(cpt_entry)):
+                
+                var_name = self.values[i]
+                val_prob = cpt_entry[i]
+                
+                acc_prob+=val_prob
+
+                if acc_prob>=rand_num:
+                    sample_value = var_name
+                    break
 
         return sample_value
     
