@@ -1,7 +1,17 @@
 
 
+import logging
 import random
 import itertools
+
+logger = logging.getLogger("BELIEF-NETWORK-LIB")
+logger.setLevel(logging.ERROR)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 class Node:
     """
@@ -47,28 +57,60 @@ class Node:
     def add_child(self, aNode):
         self.children.append(aNode)
     
-    def sample(self, parent_bindings):
+    def sample(self, parent_bindings=None):
         """
             Given bound values, sample distribution to produce a value
 
+            If a required parent is not specified, then marginalize across the parent value.
+
             parent_bindings: {parent_node_id: val, parent_node_id:val, ...}
         """
+
+        logger.info("sample - bindings: %s", parent_bindings)
+
         sample_value = None
+        
+        if len(self.parents)>0:
 
-        #Acqurie appropriate CPT entry
-        distr_for_bindings = self.cpt[parent_bindings]
-
-        #Sample retrieved distribution
-        rand_num = random.random()
-
-        acc_prob = rand_num
-        for v in self.values:
-            if None:
-                pass
+            logger.info("parents: %s" % ",".join([str(p) for p in self.parents]) )
             
-            acc_prob+=distr_for_bindings[v]
+            #Acquire appropriate CPT entry
+            #-----------------------------
 
-        return sampled_value
+            #Assemble arguments as tuple
+            bindings_as_list = [] 
+            parent_var_names_in_order = [n.id for n in self.parents]
+            
+            for p in parent_var_names_in_order:
+                bindings_as_list.append(parent_bindings[p])
+
+            bindings_as_tuple = tuple(bindings_as_list)
+            
+            cpt_entry = self.cpt[bindings_as_tuple]
+            
+            logger.info("Retrieved cpt entry: %s" % cpt_entry)
+            #-----------------------------
+            
+            #Sample retrieved distribution
+            #-----------------------------
+            # rand_num = random.random()
+
+            # acc_prob = rand_num
+            # for v in self.values:
+            #     if None:
+            #         pass
+                
+            #     acc_prob+=distr_for_bindings[v]
+            
+            # sample_value = None
+            #-----------------------------
+        else:
+            cpt_entry = self.cpt[ self.cpt.keys()[0] ]
+
+            #Acquire the only CPT entry
+            sample_value = None
+
+        return sample_value
     
     def evaluate(self):
         """ 
