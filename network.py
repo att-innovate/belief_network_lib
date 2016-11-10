@@ -26,7 +26,10 @@ class Node:
 
         #Conditional probability table
         #Entries are:
-        #{parent_node_id: val, parent_node_id: val, ...} ---> {val1: p1, val2: p2, ...}
+        
+        #(parent_node val1, parent_node val2, ...) ---> [p1, p2, ...]
+        #parent node vals in key preserve order found in 'self.parents'
+        #probabilities for values preserve order found in 'self.values'
         self.cpt = {}
     
     def init_cpt(self):
@@ -71,10 +74,6 @@ class Node:
         sample_value = None
         
         if len(self.parents)>0:
-
-            logger.info("# parents: %s" % str(len(self.parents)))
-            
-            logger.info("parents: %s" % ",".join([str(p.id) for p in self.parents]) )
             
             #Acquire appropriate CPT entry
             #-----------------------------
@@ -86,16 +85,11 @@ class Node:
             for p in parent_var_names_in_order:
                 bindings_as_list.append(parent_bindings[p])
 
-            
-            logger.info("bindings_as_list: %s" % bindings_as_list)
 
             bindings_as_tuple = tuple(bindings_as_list)
             
-            logger.info("bindings_as_tuple: %s", str(bindings_as_tuple) )
-
             cpt_entry = self.cpt[bindings_as_tuple]
             
-            logger.info("Retrieved cpt entry: %s" % cpt_entry)
             #-----------------------------
             
             #Sample retrieved distribution
@@ -117,7 +111,6 @@ class Node:
             
             #-----------------------------
         else:
-            logger.info("# parents: 0")
 
             #Acquire the only CPT entry
             cpt_entry = self.cpt[ self.cpt.keys()[0] ]
@@ -217,18 +210,24 @@ def test_data():
     nodeD.add_parent(nodeB)
     nodeB.add_parent(nodeA)
 
+    # for n in nodes:
+    #     n.init_cpt()
+
     #Specify conditional probabilities
-    # nodeA.cpt = None
-    # nodeB.cpt = None
-    # nodeC.cpt = None
-    # nodeD.cpt = None
-    # nodeE.cpt = None
+    nodeA.cpt = {None:[0.1, 0.9]}
+    nodeE.cpt = {None:[0.9, 0.1]}
+    nodeB.cpt = {(0,):[0.5, 0.5],
+                 (1,):[0.2, 0.8]}
+    nodeC.cpt = {(0,0):[0.1, 0.9],
+                 (0,1):[0.3, 0.7],
+                 (1,0):[0.4, 0.6],
+                 (1,1):[0.8, 0.2]
+                }
+    nodeD.cpt = {(0,):[0.5, 0.5],
+                 (1,):[0.7, 0.3]}
     #-------------------
 
     nodes = [nodeA, nodeB, nodeE, nodeC, nodeD]
-
-    for n in nodes:
-        n.init_cpt()
 
     aBN = BeliefNetwork(nodes)
 

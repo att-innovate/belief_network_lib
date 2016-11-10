@@ -13,6 +13,17 @@ import random
 import scipy
 from scipy.stats import chi2
 
+logger = logging.getLogger("BELIEF-NETWORK-LIB")
+logger.setLevel(logging.ERROR)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
+SIGNIFICANCE_LEVEL = 0.05
+
 class BinaryVariable(object):
     """
         Value can be 0 or 1
@@ -48,7 +59,7 @@ class NetworkInductor(object):
         self.input_file = input_file
         (self.variables, self.jpt) = self.process_input_data()
     
-    def process_input_data(self, column_names=None, delimiter=","):
+    def process_input_data(self, column_names=None, delimiter=",", normed=False):
         """ 
             If 'column_names' are not specified, then takes variable names from
             the first column of inputs.
@@ -56,7 +67,9 @@ class NetworkInductor(object):
         
         table = {}
 
-        reader = csv.reader(in_file, delimiter=delimiter)
+        reader = csv.reader(self.input_file, delimiter=delimiter)
+
+        variables = None
 
         #Acquire column names
         if column_names is None:
@@ -90,6 +103,9 @@ class NetworkInductor(object):
                 table[hashable_set]=1
             
             num_records+=1
+
+            if variables is None:
+                variables = var_set
             
         if normed:
             for k in table:
@@ -97,7 +113,7 @@ class NetworkInductor(object):
         
         return (variables, table)
     
-    def grow_blanket(self, variable_of_interest)
+    def grow_blanket(self, variable_of_interest):
         
         logger.info("Grow blanket phase for %s.", variable_of_interest)
 
@@ -111,7 +127,7 @@ class NetworkInductor(object):
         
         return curr_blanket
     
-    def shrink_blanket(self, variable_of_interest, initial_blanket) #, variables, jpt, initial_blanket):
+    def shrink_blanket(self, variable_of_interest, initial_blanket): #, variables, jpt, initial_blanket):
         logger.info("Shrink blanket phase for %s.", variable_of_interest)
         
         curr_mb_set = set(initial_blanket)
@@ -124,26 +140,35 @@ class NetworkInductor(object):
 
     #def find_markov_blanket_for(variable_of_interest, variables, jpt):
     def find_markov_blanket_for(self, variable_of_interest):
-    """ 
-        'variable_of_interest' is an instance of Variable
-        'variables': The complete set of variables identified for this domain.
-        'jpt': Joint probability table capturing counts for random variables in this domain
+        """ 
+            'variable_of_interest' is an instance of Variable
+            'variables': The complete set of variables identified for this domain.
+            'jpt': Joint probability table capturing counts for random variables in this domain
 
-        Returns:
-        -Minimal list of variables, such that variable of interest is independent of all other variables, 
-         conditioned on those in list.
-        -Uses Grow-Shrink algorithm described in "Bayesian Network Induction via Local Neighborhoods" by Margaritis and Thrun.
-    """
+            Returns:
+            -Minimal list of variables, such that variable of interest is independent of all other variables, 
+            conditioned on those in list.
+            -Uses Grow-Shrink algorithm described in "Bayesian Network Induction via Local Neighborhoods" by Margaritis and Thrun.
+        """
+
+        intermediate_list = self.grow_blanket(variable_of_interest)
+        return_set = self.shrink_blanket(variable_of_interest, intermediate_list)
+
+        return return_set
+
+
+
+def get_var(var_name, var_val):
     
-    # intermediate_list = self.grow_blanket(variable_of_interest, variables, jpt)
-    # return_set = self.shrink_blanket(variable_of_interest, variables, jpt, intermediate_list)
-
-    intermediate_list = self.grow_blanket(variable_of_interest)
-    return_set = self.shrink_blanket(variable_of_interest, intermediate_list)
-
-    return return_set
-
-
+    new_var = None
+    
+    cached_version = BinaryVariable.get_cached(var_name, var_val)
+    if cached_version is None:
+        new_var = BinaryVariable(var_name, init_val=var_val)
+    else:
+        new_var = cached_version
+    
+    return new_var
 
 def generate_possible_bindings(var_list, sample=False, num_samples=30):
     return_bindings = []
