@@ -22,7 +22,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
-SIGNIFICANCE_LEVEL = 0.05
+SIGNIFICANCE_LEVEL = 0.5
 
 class BinaryVariable(object):
     """
