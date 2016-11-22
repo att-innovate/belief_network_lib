@@ -69,6 +69,7 @@ class Node:
     
     def sample(self, parent_bindings=None):
         """
+
             Given bound values, sample distribution to produce a value
 
             If a required parent is not specified, then marginalize across the parent value.
@@ -118,7 +119,6 @@ class Node:
             
             #-----------------------------
         else:
-
             #Acquire the only CPT entry
             cpt_entry = self.cpt[ self.cpt.keys()[0] ]
 
@@ -158,7 +158,15 @@ class BeliefNetwork:
         pass
     
     def sample(self, bindings=None):
-        #Cascade of sampling, resulting in an entire record
+        """
+            Cascade of sampling, resulting in an entire record
+
+            Uses simple Forward Sampling algorithm, described in:
+            "Probabilistic Graphical Models: Principles and Techniques" by Koller and Friedman
+            Chapter 12
+
+            'bindings': {<variable name>:<variable value>, ...}
+        """
         
         #Acquire nodes sorted in topological order
         sorted_nodes = self.nodes
@@ -166,28 +174,31 @@ class BeliefNetwork:
         nodes_to_value = {}
 
         for n in sorted_nodes:
-            logger.info("nodes_to_value: %s" % nodes_to_value)
 
-            logger.info("Getting sample for %s" % n.id)
+            if n.id in bindings:
+                logger.info("Using bound value: %s" % str(bindings[n.id]) )
+                nodes_to_value[n.id] = bindings[n.id]
+            else:
+                logger.info("Getting sample for %s" % n.id)
 
-            #Determine value of parent nodes
-            #-------------------------------
-            parent_ids = [p.id for p in n.parents]
+                #Determine value of parent nodes
+                #-------------------------------
+                parent_ids = [p.id for p in n.parents]
 
-            logger.info("Parents: %s" % ",".join(parent_ids))
+                logger.info("Parents: %s" % ",".join(parent_ids))
 
-            parent_node_vals = {}
-            
-            for p in parent_ids:
-                parent_node_vals[p] = nodes_to_value[p]
-            #-------------------------------
+                parent_node_vals = {}
+                
+                for p in parent_ids:
+                    parent_node_vals[p] = nodes_to_value[p]
+                #-------------------------------
 
-            #Acquire value for this node
-            sampled_value = n.sample(parent_node_vals)
+                #Acquire value for this node
+                sampled_value = n.sample(parent_node_vals)
 
-            logger.info("sampled value for %s: %s" % (n.id, sampled_value))
+                logger.info("sampled value for %s: %s" % (n.id, sampled_value))
 
-            nodes_to_value[n.id] = sampled_value
+                nodes_to_value[n.id] = sampled_value
         
         return nodes_to_value
     
