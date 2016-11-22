@@ -4,9 +4,9 @@ Bayesian belief networks (aka Bayesian networks, aka probabilistic graphical mod
 
 There is great utility, however, in learning this structure given only collections of data samples. One highly useful application, for which this library was specifically created to address, is dimensionality reduction in cases where variables have strong non-linear relationships. 
 
-In cases where there is a linear relationship between the variables, an approach relying on covariance such as Principal Components Analysis is applicable and highly effective. In cases where variables' relationships are non-linear (e.g. highly discontinuous), other methods are motivated. 
+In cases where there is a linear relationship between the variables, an approach relying on covariance, such as Principal Components Analysis, is applicable and highly effective. In cases where variables' relationships are non-linear (e.g. highly discontinuous), other methods are motivated. 
 
-An example of using this library to accomplish this specific application is contained the Juypter notebook in the 'examples' directory.
+An example of using this library to accomplish this specific application is contained in the Juypter notebook in the 'examples' directory.
 
 # Installation
 
