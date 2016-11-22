@@ -10,6 +10,7 @@ import logging
 import csv
 import random
 import itertools
+import math
 
 import scipy
 from scipy.stats import chi2
@@ -23,6 +24,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
+BINDINGS_THRESHOLD = 30
 SIGNIFICANCE_LEVEL = 0.05
 
 class BinaryVariable(object):
@@ -127,7 +129,7 @@ class NetworkInductor(object):
         other_vars = var_set-{variable_of_interest}
         curr_blanket = []
         for o in other_vars:
-            if is_conditionally_dependent_given(variable_of_interest, o, curr_blanket, jp_table=self.jpt, sample=True):
+            if is_conditionally_dependent_given(variable_of_interest, o, curr_blanket, jp_table=self.jpt):
                 curr_blanket.append(o)
         
         return curr_blanket
@@ -138,7 +140,7 @@ class NetworkInductor(object):
         curr_mb_set = set(initial_blanket)
 
         for y in initial_blanket:
-            if not is_conditionally_dependent_given(variable_of_interest, y, curr_mb_set - {y}, jp_table=self.jpt, sample=True):
+            if not is_conditionally_dependent_given(variable_of_interest, y, curr_mb_set - {y}, jp_table=self.jpt):
                 curr_mb_set.difference_update({y})
 
         return curr_mb_set
@@ -175,10 +177,8 @@ def get_var(var_name, var_val):
     
     return new_var
 
-def generate_possible_bindings(var_list, sample=False, num_samples=30):
-    """
-        'var_list' is a list of names of variables (strings)
-    """
+def get_sample_bindings(var_list, num_samples):
+    logger.info("Sampling bindings - acquiring %s samples." % str(num_samples))
     
     return_bindings = []
 
@@ -188,22 +188,67 @@ def generate_possible_bindings(var_list, sample=False, num_samples=30):
         var_1 = get_var(var_name, "1")
         var_matrix.append((var_0, var_1))
     
-    if sample:
-        for i in range(num_samples):
-            new_binding = []
+    for i in range(num_samples):
+        new_binding = []
 
-            random_binary_string = [random.choice([0,1]) for i in range(len(var_list))]
+        random_binary_string = [random.choice([0,1]) for i in range(len(var_list))]
 
-            for j in range(len(random_binary_string)):
-                new_binding.append(var_matrix[j][random_binary_string[j]])
-            
-            return_bindings.append(new_binding)
+        for j in range(len(random_binary_string)):
+            new_binding.append(var_matrix[j][random_binary_string[j]])
+        
+        return_bindings.append(new_binding)
+    
+    return return_bindings
+
+def get_all_bindings(var_list):
+    logger.info("Getting all bindings for variables: %s" % ", ".join(var_list))
+
+    return_bindings = []
+
+    var_matrix = []
+    for var_name in var_list:
+        var_0 = get_var(var_name, "0")
+        var_1 = get_var(var_name, "1")
+        var_matrix.append((var_0, var_1))
+
+    it = itertools.product(*var_matrix)
+    for e in it:
+        return_bindings.append(e)
+        
+    return return_bindings
+
+def generate_possible_bindings(var_list, sample=None):
+    """
+        'var_list' is a list of names of variables (strings)
+
+        'sample':
+            -If True, instead of generating each possible binding, a randomly
+            selected sample of bindings is generated.
+            -If False, then each possible binding is used.
+            -If None, then if # total bindings is less than threshold (defined in generate_possible_bindings),
+            all bindings are used. If greater than threshold, then switches to sampling. 
+    """
+    
+    logger.info("Generating bindings for variables: %s" % ", ".join(var_list))
+
+    #Determine num_samples
+
+    return_bindings = []
+    
+    if sample is None:
+        total_num_bindings = math.pow(2, len(var_list))
+
+        if total_num_bindings > BINDINGS_THRESHOLD:
+            num_samples = int(math.floor((0.8)*total_num_bindings))
+            return_bindings = get_sample_bindings(var_list, num_samples)
+        else:
+            return_bindings = get_all_bindings(var_list)
+    elif sample is True:
+        num_samples = int(math.floor((0.8)*total_num_bindings))
+        return_bindings = get_sample_bindings(var_list, num_samples)
     else:
-        it = itertools.product(*var_matrix)
-        for e in it:
-            return_bindings.append(e)
-    
-    
+        return_bindings = get_all_bindings(var_list)
+            
     return return_bindings
 
 def get_event_count(jp_table, set_of_bound_vars):
@@ -311,14 +356,19 @@ def check_dependent_test(var_i, var_o, binding, jp_table):
 
     return is_dependent
 
-def is_conditionally_dependent_given(var_i, var_o, cond_vars, jp_table, sample=True):
+def is_conditionally_dependent_given(var_i, var_o, cond_vars, jp_table, sample=None):
     """ 
         Is (binary) variable var_i dependent upon (binary) variable var_o, conditioned upon
         variables in cond_vars? 
 
         This test is performed sequentially, for each possible binding of cond_vars.
-        If 'sample' is true, then instead of using each possible, binding, a randomly
-        selected sample of bindings is used. 
+        
+        'sample' parameter:
+            -If True, then instead of using each possible binding, a randomly
+            selected sample of bindings is used.
+            -If False, then each possible binding is used.
+            -If None, then if # total bindings is less than threshold (defined in generate_possible_bindings),
+            all bindings are used. If greater than threshold, then switches to sampling. 
 
         For each such binding, a Chi^2 test of indepdenence is performed.
 
