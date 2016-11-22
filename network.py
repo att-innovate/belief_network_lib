@@ -166,6 +166,8 @@ class BeliefNetwork:
             Chapter 12
 
             'bindings': {<variable name>:<variable value>, ...}
+
+            Assumes 'self.nodes' are in topological sorted order.
         """
         
         #Acquire nodes sorted in topological order
