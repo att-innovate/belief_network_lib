@@ -1,5 +1,9 @@
 
-# network_inductory.py
+#
+#   network_learner.py
+#
+#   Library for inducing a Bayesian Belief Netowrk from CSV data.
+#   Only binary variables are supported at this time.  
 #
 #   Author: Don M. Dini
 #   Date: November 2016
@@ -54,7 +58,7 @@ class BinaryVariable(object):
         else:
             return None
 
-class NetworkInductor(object):
+class NetworkLearner(object):
     """
     """
 

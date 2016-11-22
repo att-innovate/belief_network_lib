@@ -1,4 +1,11 @@
 
+#
+#   network.py
+#   
+#   Simple Bayesian Belief Network library.
+#
+#   Author: Don M. Dini
+#   November 2016
 
 import logging
 import random
