@@ -9,6 +9,7 @@ import logging
 
 import csv
 import random
+import itertools
 
 import scipy
 from scipy.stats import chi2
@@ -22,7 +23,7 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
-SIGNIFICANCE_LEVEL = 0.5
+SIGNIFICANCE_LEVEL = 0.05
 
 class BinaryVariable(object):
     """
@@ -57,6 +58,8 @@ class NetworkInductor(object):
 
     def __init__(self, input_file, column_names=None, delimiter=","):
         self.input_file = input_file
+        
+        #self.variables is a set of strings indicating names of variables
         (self.variables, self.jpt) = self.process_input_data()
     
     def process_input_data(self, column_names=None, delimiter=",", normed=False):
@@ -111,7 +114,9 @@ class NetworkInductor(object):
             for k in table:
                 table[k] = float(table[k])/num_records
         
-        return (variables, table)
+        var_names = set([v.name for v in variables])
+
+        return (var_names, table)
     
     def grow_blanket(self, variable_of_interest):
         
@@ -171,12 +176,16 @@ def get_var(var_name, var_val):
     return new_var
 
 def generate_possible_bindings(var_list, sample=False, num_samples=30):
+    """
+        'var_list' is a list of names of variables (strings)
+    """
+    
     return_bindings = []
 
     var_matrix = []
-    for v in var_list:
-        var_0 = get_var(v.name, "0")
-        var_1 = get_var(v.name, "1")
+    for var_name in var_list:
+        var_0 = get_var(var_name, "0")
+        var_1 = get_var(var_name, "1")
         var_matrix.append((var_0, var_1))
     
     if sample:
@@ -190,7 +199,9 @@ def generate_possible_bindings(var_list, sample=False, num_samples=30):
             
             return_bindings.append(new_binding)
     else:
-        pass
+        it = itertools.product(*var_matrix)
+        for e in it:
+            return_bindings.append(e)
     
     
     return return_bindings
@@ -236,6 +247,8 @@ def get_test_statistic(n, x00, x01, x10, x11):
 
 def check_dependent_test(var_i, var_o, binding, jp_table):
     """ 
+        'var_i', 'var_o' are names of variables (strings)
+
         'binding' is a list of Variable instances, set to 
         specific values. 
 
@@ -244,10 +257,10 @@ def check_dependent_test(var_i, var_o, binding, jp_table):
     
     is_dependent = False
 
-    var_i_0 = get_var(var_i.name, "0")
-    var_i_1 = get_var(var_i.name, "1")
-    var_o_0 = get_var(var_o.name, "0")
-    var_o_1 = get_var(var_o.name, "1")
+    var_i_0 = get_var(var_i, "0")
+    var_i_1 = get_var(var_i, "1")
+    var_o_0 = get_var(var_o, "0")
+    var_o_1 = get_var(var_o, "1")
 
     #Obtain individual event counts
     #------------------------------
@@ -308,12 +321,20 @@ def is_conditionally_dependent_given(var_i, var_o, cond_vars, jp_table, sample=T
         selected sample of bindings is used. 
 
         For each such binding, a Chi^2 test of indepdenence is performed.
+
+        var_i is the name of a variable (string)
+        var_o is the name of a variable (string)
+        cond_vars is a list of names of variables (list of strings)
     """
     
+    logger.info("Checking - %s conditionally independent of %s given %s" % (var_i, var_o, ", ".join([str(s) for s in cond_vars]) ))
+
     #The null position
     is_dependent = False 
 
     #Acquire bindings for conditional variables
+    #'bindings' is a list of bound variables - BinaryVariable instances
+    # with set (non-None) values. 
     bindings = generate_possible_bindings(list(cond_vars), sample=sample)
 
     #All it takes is dependence under one binding for dependence
