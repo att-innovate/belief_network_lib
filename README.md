@@ -36,7 +36,7 @@ aBN = network.BeliefNetwork(nodes)
 samples = [aBN.sample() for x in range(1000)]
 ~~~~
 
-where `samples` now contains:
+`samples` now contains:
 
 ~~~~
 [{'A': 1, 'B': 1},
