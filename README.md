@@ -33,7 +33,7 @@ aBN = BeliefNetwork(nodes)
 samples = [aBN.sample() for x in range(1000)]
 ~~~~
 
-## Detect markov blanket
+## Detect markov blanket given data
 
 ~~~~
 from belief-network-lib import network_learner
