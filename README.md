@@ -16,7 +16,6 @@ An example of using this library to accomplish this specific application is cont
 
 ~~~~
 from belief_network_lib import network
-from network import Node, BeliefNetwork
 
 nodeA = network.Node([0,1], id="A")
 nodeB = network.Node([0,1], id="B")
@@ -58,7 +57,7 @@ samples = [aBN.sample() for x in range(1000)]
 ## Detect markov blanket given data
 
 ~~~~
-from belief-network-lib import network_learner
+from belief_network_lib import network_learner
 
 input_file = open(path/to/csv/file)
 aNI = network_learner.NetworkLearner(input_file)
@@ -67,3 +66,5 @@ aNI.find_markov_blanket_for("B")
 ~~~~
 
 # Links
+
+* Margaritis, Dimitris, and Sebastian Thrun. Bayesian network induction via local neighborhoods. No. CMU-CS-99-134. CARNEGIE-MELLON UNIV PITTSBURGH PA DEPT OF COMPUTER SCIENCE, 1999. [Link to paper](http://www.dtic.mil/dtic/tr/fulltext/u2/a373341.pdf)
