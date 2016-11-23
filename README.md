@@ -37,6 +37,11 @@ samples = [aBN.sample() for x in range(1000)]
 
 ~~~~
 from belief-network-lib import network_learner
+
+input_file = open(path/to/csv/file)
+aNI = network_learner.NetworkLearner(input_file)
+
+aNI.find_markov_blanket_for("B")
 ~~~~
 
 # Links
