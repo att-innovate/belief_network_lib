@@ -16,6 +16,7 @@ An example of using this library to accomplish this specific application is cont
 
 ~~~~
 from belief-network-lib import network
+from network import Node, BeliefNetwork
 
 nodeA = Node([0,1], id="A")
 nodeB = Node([0,1], id="B")
