@@ -18,8 +18,8 @@ An example of using this library to accomplish this specific application is cont
 from belief_network_lib import network
 from network import Node, BeliefNetwork
 
-nodeA = Node([0,1], id="A")
-nodeB = Node([0,1], id="B")
+nodeA = network.Node([0,1], id="A")
+nodeB = network.Node([0,1], id="B")
 
 nodeA.cpt = {None: [0.4, 0.6]}   #Node A has no parents, thus the key in the conditional probability table is None
 
@@ -31,9 +31,28 @@ nodeA.add_child(nodeB)
 nodeB.add_parent(nodeA)
 
 nodes = [nodeA, nodeB]
-aBN = BeliefNetwork(nodes)
+aBN = network.BeliefNetwork(nodes)
 
 samples = [aBN.sample() for x in range(1000)]
+~~~~
+
+where `samples` now contains:
+
+~~~~
+[{'A': 1, 'B': 1},
+ {'A': 0, 'B': 1},
+ {'A': 1, 'B': 1},
+ {'A': 0, 'B': 1},
+ {'A': 1, 'B': 1},
+ {'A': 0, 'B': 1},
+ {'A': 0, 'B': 0},
+ {'A': 0, 'B': 0},
+ {'A': 0, 'B': 0},
+ {'A': 1, 'B': 1}
+ .
+ .
+ .
+ ]
 ~~~~
 
 ## Detect markov blanket given data
