@@ -1,4 +1,4 @@
-# belief-network-lib
+# belief_network_lib
 
 Bayesian belief networks (aka Bayesian networks, aka probabilistic graphical models) are a powerful tool for representing dependence relationships in probability distributions. Given a joint probability distribution, Pr(X1, X2, ..., Xk), a table representing this requires |X1|X...X|Xk| entries. This representation can be accomplished much more compactly by identifying conditional independence relationships among the variables. Belief networks, are one method of encoding these independence relationships. Once this network is identified, it can then be used to perform various types of probabilistic inference. 
 
@@ -15,7 +15,7 @@ An example of using this library to accomplish this specific application is cont
 ## Create a network and sample data
 
 ~~~~
-from belief-network-lib import network
+from belief_network_lib import network
 from network import Node, BeliefNetwork
 
 nodeA = Node([0,1], id="A")
