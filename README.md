@@ -12,4 +12,30 @@ An example of using this library to accomplish this specific application is cont
 
 # Usage
 
+## Create a network and sample data
+
+~~~~
+from belief-network-lib import network
+
+nodeA = Node([0,1], id="A")
+nodeB = Node([0,1], id="B")
+
+nodeA.cpt = {}
+nodeB.cpt = {}
+
+nodeA.add_child(nodeB)
+nodeB.add_parent(nodeA)
+
+nodes = [nodeA, nodeB]
+aBN = BeliefNetwork(nodes)
+
+samples = [aBN.sample() for x in range(1000)]
+~~~~
+
+## Detect markov blanket
+
+~~~~
+from belief-network-lib import network_learner
+~~~~
+
 # Links
