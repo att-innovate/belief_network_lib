@@ -177,7 +177,7 @@ class BeliefNetwork:
 
         for n in sorted_nodes:
 
-            if n.id in bindings:
+            if bindings is not None and n.id in bindings:
                 logger.info("Using bound value: %s" % str(bindings[n.id]) )
                 nodes_to_value[n.id] = bindings[n.id]
             else:
