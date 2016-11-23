@@ -23,8 +23,9 @@ nodeB = Node([0,1], id="B")
 
 nodeA.cpt = {None: [0.4, 0.6]}   #Node A has no parents, thus the key in the conditional probability table is None
 
-nodeB.cpt = {(0,):[0.5, 0.5], (1,):[0.1, 0.9]}  #Node B has one parent, thus the conditional probability table as two entries 
-                                                #- one for each possible value the parent (A) might take on.
+nodeB.cpt = {(0,):[0.5, 0.5], (1,):[0.1, 0.9]}  #Node B has one parent, thus the conditional 
+                                                #probability table has two entries, one for
+                                                #each possible value the parent (A) might take on.
 
 nodeA.add_child(nodeB)
 nodeB.add_parent(nodeA)
