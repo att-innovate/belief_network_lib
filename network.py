@@ -227,21 +227,21 @@ def notebook_data():
     nodeX2 = Node([0,1], id="X2")
     #Subtree of variables
     node2_subnodes = []
-    for i in range(50):
+    for i in range(5):
         subnode = Node([0,1], id="X2%s" % i)
         node2_subnodes.append(subnode)
 
     nodeX3 = Node([0,1], id="X3")
     #Subtree of variables
     node3_subnodes = []
-    for i in range(25):
+    for i in range(5):
         subnode = Node([0,1], id="X3%s" % i)
         node3_subnodes.append(subnode)
 
     nodeX4 = Node([0,1], id="X4")
     #Subtree of variables
     node4_subnodes = []
-    for i in range(25):
+    for i in range(5):
         subnode = Node([0,1], id="X4%s" % i)
         node4_subnodes.append(subnode)
     
@@ -274,6 +274,12 @@ def notebook_data():
     #Conditional probability tables
     nodeY.cpt = {(0,0,0,0):[0.99, 0.01], (0,0,0,1):[0.99, 0.01], (0,0,1,0):[0.99, 0.01], (0,0,1,1):[0.01, 0.99], (0,1,0,0):[0.99, 0.01], (0,1,0,1):[0.01, 0.99], (0,1,1,0):[0.01, 0.99], (0,1,1,1):[0.99, 0.01], (1,0,0,0):[0.99, 0.01], (1,0,0,1):[0.99, 0.01], (1,0,1,0):[0.99, 0.01], (1,0,1,1):[0.99, 0.01], (1,1,0,0):[0.01, 0.99], (1,1,0,1):[0.99, 0.01], (1,1,1,0):[0.99, 0.01], (1,1,1,1):[0,1]}
 
+    #Node 1 and subtree
+    #------------------
+    rand_val = random.random()
+    nodeX1.cpt = {None:[rand_val, 1-rand_val]}
+    #------------------
+    
     #Node 2 and subtree
     #------------------
     nodeX2.cpt = {}
@@ -322,11 +328,11 @@ def notebook_data():
     nodes.extend(node4_subnodes)
     nodes.extend(node3_subnodes)
     nodes.extend(node2_subnodes)
-    nodes.extend(nodeX2)
-    nodes.extend(nodeX3)
-    nodes.extend(nodeX4)
-    nodes.extend(nodeX1)
-    nodes.extend(nodeY)
+    nodes.append(nodeX2)
+    nodes.append(nodeX3)
+    nodes.append(nodeX4)
+    nodes.append(nodeX1)
+    nodes.append(nodeY)
 
     aBN = BeliefNetwork(nodes)
     
