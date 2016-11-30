@@ -11,7 +11,7 @@
 #   An example of creating a BeliefNetwork instance is contained in the readme.
 #
 #   Author: Don M. Dini
-#   November 2016
+#   Date: November 2016
 #
 
 import logging
@@ -32,7 +32,7 @@ class Node:
         A Node in a belief network. It is assumed this node takes on discrete values.
     """
 
-    def __init__(self, values, id="Node"):
+    def __init__(self, values=[0,1], id="Node"):
         self.id = id
         self.children = []
         self.parents = []
@@ -219,29 +219,29 @@ class BeliefNetwork:
 
 def notebook_data():
 
-    nodeY = Node([0,1], id="Y")
+    nodeY = Node(id="Y")
 
-    nodeX1 = Node([0,1], id="X1")
+    nodeX1 = Node(id="X1")
 
-    nodeX2 = Node([0,1], id="X2")
+    nodeX2 = Node(id="X2")
     #Subtree of variables
     node2_subnodes = []
     for i in range(5):
-        subnode = Node([0,1], id="X2%s" % i)
+        subnode = Node(id="X2%s" % i)
         node2_subnodes.append(subnode)
 
-    nodeX3 = Node([0,1], id="X3")
+    nodeX3 = Node(id="X3")
     #Subtree of variables
     node3_subnodes = []
     for i in range(5):
-        subnode = Node([0,1], id="X3%s" % i)
+        subnode = Node(id="X3%s" % i)
         node3_subnodes.append(subnode)
 
-    nodeX4 = Node([0,1], id="X4")
+    nodeX4 = Node(id="X4")
     #Subtree of variables
     node4_subnodes = []
     for i in range(5):
-        subnode = Node([0,1], id="X4%s" % i)
+        subnode = Node(id="X4%s" % i)
         node4_subnodes.append(subnode)
     
     #Parent child relationships
