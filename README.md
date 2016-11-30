@@ -54,7 +54,7 @@ samples = [aBN.sample() for x in range(1000)]
  ]
 ~~~~
 
-## Detect markov blanket given data
+## Detect Markov blanket given data
 
 ~~~~
 from belief_network_lib import network_learner
