@@ -87,7 +87,6 @@ class Node:
     
     def sample(self, parent_bindings=None):
         """
-
             Given bound values, sample distribution to produce a value
 
             If a required parent is not specified, then marginalize across the parent value.
