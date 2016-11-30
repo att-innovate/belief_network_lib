@@ -29,7 +29,6 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 BINDINGS_THRESHOLD = 30
-SIGNIFICANCE_LEVEL = 0.05
 
 class BinaryVariable(object):
     """
@@ -124,7 +123,7 @@ class NetworkLearner(object):
 
         return (var_names, table)
     
-    def grow_blanket(self, variable_of_interest):
+    def grow_blanket(self, variable_of_interest, significance=0.5):
         
         logger.info("Grow blanket phase for %s.", variable_of_interest)
 
@@ -133,24 +132,24 @@ class NetworkLearner(object):
         other_vars = var_set-{variable_of_interest}
         curr_blanket = []
         for o in other_vars:
-            if is_conditionally_dependent_given(variable_of_interest, o, curr_blanket, jp_table=self.jpt):
+            if is_conditionally_dependent_given(variable_of_interest, o, curr_blanket, jp_table=self.jpt, significance=significance):
                 curr_blanket.append(o)
         
         return curr_blanket
     
-    def shrink_blanket(self, variable_of_interest, initial_blanket): #, variables, jpt, initial_blanket):
+    def shrink_blanket(self, variable_of_interest, initial_blanket, significance=0.5):
         logger.info("Shrink blanket phase for %s.", variable_of_interest)
         
         curr_mb_set = set(initial_blanket)
 
         for y in initial_blanket:
-            if not is_conditionally_dependent_given(variable_of_interest, y, curr_mb_set - {y}, jp_table=self.jpt):
+            if not is_conditionally_dependent_given(variable_of_interest, y, curr_mb_set - {y}, jp_table=self.jpt, significance=significance):
                 curr_mb_set.difference_update({y})
 
         return curr_mb_set
 
     #def find_markov_blanket_for(variable_of_interest, variables, jpt):
-    def find_markov_blanket_for(self, variable_of_interest):
+    def find_markov_blanket_for(self, variable_of_interest, significance=0.5):
         """ 
             'variable_of_interest' is an instance of Variable
             'variables': The complete set of variables identified for this domain.
@@ -162,8 +161,8 @@ class NetworkLearner(object):
             -Uses Grow-Shrink algorithm described in "Bayesian Network Induction via Local Neighborhoods" by Margaritis and Thrun.
         """
 
-        intermediate_list = self.grow_blanket(variable_of_interest)
-        return_set = self.shrink_blanket(variable_of_interest, intermediate_list)
+        intermediate_list = self.grow_blanket(variable_of_interest, significance=significance)
+        return_set = self.shrink_blanket(variable_of_interest, intermediate_list, significance=significance)
 
         return return_set
 
@@ -294,7 +293,7 @@ def get_test_statistic(n, x00, x01, x10, x11):
 
     return term1 + term2 + term3 + term4
 
-def check_dependent_test(var_i, var_o, binding, jp_table):
+def check_dependent_test(var_i, var_o, binding, jp_table, significance=0.5):
     """ 
         'var_i', 'var_o' are names of variables (strings)
 
@@ -354,13 +353,13 @@ def check_dependent_test(var_i, var_o, binding, jp_table):
 
     logger.info("p_val: %s" % p_val)
 
-    if p_val<=SIGNIFICANCE_LEVEL:
+    if p_val<=significance:
         is_dependent = True
     #------------------------------
 
     return is_dependent
 
-def is_conditionally_dependent_given(var_i, var_o, cond_vars, jp_table, sample=None):
+def is_conditionally_dependent_given(var_i, var_o, cond_vars, jp_table, sample=None, significance=0.5):
     """ 
         Is (binary) variable var_i dependent upon (binary) variable var_o, conditioned upon
         variables in cond_vars? 
@@ -394,7 +393,7 @@ def is_conditionally_dependent_given(var_i, var_o, cond_vars, jp_table, sample=N
     #All it takes is dependence under one binding for dependence
     #overall to occur
     for binding in bindings:
-        if check_dependent_test(var_i, var_o, binding, jp_table):
+        if check_dependent_test(var_i, var_o, binding, jp_table, significance=significance):
             is_dependent = True
             break
 
