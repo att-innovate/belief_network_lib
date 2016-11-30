@@ -2,10 +2,17 @@
 #
 #   network.py
 #   
-#   Simple Bayesian Belief Network library.
+#   Description: Simple Bayesian Belief Network library.
+#   The class BeliefNetwork implements a representation of a Bayesian Belief network, in which each
+#   variable is a binary variable (taking on the values 0 or 1).
+#
+#   Once specified, the network can then be sampled (using forward sampling) to create data samples.
+#   
+#   An example of creating a BeliefNetwork instance is contained in the readme.
 #
 #   Author: Don M. Dini
 #   November 2016
+#
 
 import logging
 import random
@@ -150,12 +157,6 @@ class Node:
                     break
 
         return sample_value
-    
-    def evaluate(self):
-        """ 
-            Acquire values with their probabilites.
-        """
-        pass
 
 class BeliefNetwork:
     def __init__(self, nodes):
@@ -163,8 +164,10 @@ class BeliefNetwork:
     
     def __str__(self):
         """
-        ASCII art version of network. 
+        ASCII art version of network.
         """
+
+        #TODO
 
         pass
     
@@ -191,10 +194,8 @@ class BeliefNetwork:
         for n in sorted_nodes:
 
             if bindings is not None and n.id in bindings:
-                #logger.info("Using bound value: %s" % str(bindings[n.id]) )
                 nodes_to_value[n.id] = bindings[n.id]
             else:
-                #logger.info("Getting sample for %s" % n.id)
 
                 #Determine value of parent nodes
                 #-------------------------------
@@ -208,8 +209,6 @@ class BeliefNetwork:
 
                 #Acquire value for this node
                 sampled_value = n.sample(parent_node_vals)
-
-                #logger.info("sampled value for %s: %s" % (n.id, sampled_value))
 
                 nodes_to_value[n.id] = sampled_value
         
@@ -340,131 +339,6 @@ def notebook_data():
     samples = [aBN.sample() for x in range(10000)]
 
     return samples
-    
-
-def notebook_data_1():
-
-    """ 
-        One Thousand variables.
-        One of the variables we're interested in producing a classifier for. 
-    """
-
-    #Create network
-    nodeY = Node([0,1], id="Y")
-    
-    nodeX1 = Node([0,1], id="X1")
-    nodeX2 = Node([0,1], id="X2")
-    nodeX3 = Node([0,1], id="X3")
-    nodeX4 = Node([0,1], id="X4")
-    nodeX5 = Node([0,1], id="X5")
-    nodeX6 = Node([0,1], id="X6")
-    nodeX7 = Node([0,1], id="X7")
-    nodeX8 = Node([0,1], id="X8")
-    nodeX9 = Node([0,1], id="X9")
-    nodeX10 = Node([0,1], id="X10")
-
-    #Parents
-    nodeY.add_parent(nodeX1)
-    nodeY.add_parent(nodeX2)
-    nodeY.add_parent(nodeX3)
-    nodeY.add_parent(nodeX4)
-
-    nodeX1.add_parent(nodeX7)
-    nodeX1.add_parent(nodeX8)
-
-    nodeX3.add_parent(nodeX5)
-
-    nodeX4.add_parent(nodeX6)
-    
-    nodeX6.add_parent(nodeX10)
-    nodeX6.add_parent(nodeX9)
-
-    #Children
-    nodeX1.add_child(nodeY)
-    nodeX2.add_child(nodeY)
-
-    nodeX7.add_child(nodeX1)
-    nodeX8.add_child(nodeX1)
-
-    nodeX3.add_child(nodeY)
-    nodeX4.add_child(nodeY)
-    nodeX5.add_child(nodeX3)
-    nodeX6.add_child(nodeX4)
-    nodeX10.add_child(nodeX6)
-    nodeX9.add_child(nodeX6)
-
-    #CPTs
-    
-    nodeY.cpt = {(0,0,0,0):[0.99, 0.01], (0,0,0,1):[0.99, 0.01], (0,0,1,0):[0.99, 0.01], (0,0,1,1):[0.99, 0.01], (0,1,0,0):[0.99, 0.01], (0,1,0,1):[0.99, 0.01], (0,1,1,0):[0.99, 0.01], (0,1,1,1):[0.99, 0.01], (1,0,0,0):[0.99, 0.01], (1,0,0,1):[0.99, 0.01], (1,0,1,0):[0.99, 0.01], (1,0,1,1):[0.99, 0.01], (1,1,0,0):[0.99, 0.01], (1,1,0,1):[0.99, 0.01], (1,1,1,0):[0.99, 0.01], (1,1,1,1):[0,1]}
-
-    nodeX1.cpt = {(0,0):[0.99, 0.01], (0,1):[0.99, 0.01], (1,0):[0.99, 0.01], (1,1):[0,1]}
-    
-    nodeX2.cpt = {None:[0.5, 0.5]}
-    nodeX3.cpt = {(0,):[0.99, 0.01], (1,):[0.2, 0.8]}
-    nodeX4.cpt = {(0,):[0.99, 0.01], (1,):[0.99, 0.01]}
-    nodeX5.cpt = {None:[0.5, 0.5]}
-    nodeX6.cpt = {(0,0):[0.99, 0.01], (0,1):[0, 1], (1,0):[0,1], (1,1):[0.99, 0.01]}
-    nodeX7.cpt = {None:[0.5, 0.5]}
-    nodeX8.cpt = {None:[0.5, 0.5]}
-    nodeX9.cpt = {None:[0.5, 0.5]}
-    nodeX10.cpt = {None:[0.5, 0.5]}
-
-    #Create and sample network
-    nodes = [nodeX7, nodeX8, nodeX5, nodeX10, nodeX9, nodeX6, nodeX1, nodeX2, nodeX3, nodeX4, nodeY]
-    aBN = BeliefNetwork(nodes)
-    samples = [aBN.sample() for x in range(10000)]
-
-    return samples
-
-
-def test_data():
-
-    #Create test network
-    #-------------------
-    
-    #Create Nodes
-    nodeA = Node([0,1], id="A")
-    nodeB = Node([0,1], id="B")
-    nodeC = Node([0,1], id="C")
-    nodeD = Node([0,1], id="D")
-    nodeE = Node([0,1], id="E")
-    
-    #Create connections
-    nodeA.add_child(nodeB)
-    nodeB.add_child(nodeC)
-    nodeB.add_child(nodeD)
-    nodeE.add_child(nodeC)
-
-    nodeC.add_parent(nodeB)
-    nodeC.add_parent(nodeE)
-    nodeD.add_parent(nodeB)
-    nodeB.add_parent(nodeA)
-
-    # for n in nodes:
-    #     n.init_cpt()
-
-    #Specify conditional probabilities
-    nodeA.cpt = {None:[0.1, 0.9]}
-    nodeE.cpt = {None:[0.9, 0.1]}
-    nodeB.cpt = {(0,):[0.5, 0.5],
-                 (1,):[0.01, 0.99]}
-    nodeC.cpt = {(0,0):[0.01, 0.99],
-                 (0,1):[0.3, 0.7],
-                 (1,0):[0.99, 0.01],
-                 (1,1):[0.8, 0.2]
-                }
-    nodeD.cpt = {(0,):[0.99, 0.01],
-                 (1,):[0.01, 0.99]}
-    #-------------------
-
-    nodes = [nodeA, nodeB, nodeE, nodeC, nodeD]
-
-    aBN = BeliefNetwork(nodes)
-
-    #Obtain sample data
-    #record = aBN.sample()
-
-    return aBN
 
 def main():
     pass

@@ -2,8 +2,12 @@
 #
 #   network_learner.py
 #
-#   Library for inducing a Bayesian Belief Netowrk from CSV data.
-#   Only binary variables are supported at this time.  
+#   Description:
+#   Library for learning a Bayesian Belief Netowrk from CSV data.
+#   Binary variables are supported at this time.
+#
+#   See examples directory for a comprehensive (Jupyter notebook) example of using this library
+#   to solve problems.    
 #
 #   Author: Don M. Dini
 #   Date: November 2016
