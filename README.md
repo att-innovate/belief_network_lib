@@ -17,8 +17,8 @@ An example of using this library to accomplish this specific application is cont
 ~~~~
 from belief_network_lib import network
 
-nodeA = network.Node([0,1], id="A")
-nodeB = network.Node([0,1], id="B")
+nodeA = network.Node(id="A")
+nodeB = network.Node(id="B")
 
 nodeA.cpt = {None: [0.4, 0.6]}   #Node A has no parents, thus the key in the conditional probability table is None
 
