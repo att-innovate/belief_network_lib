@@ -30,7 +30,7 @@ nodeA.add_child(nodeB)
 nodeB.add_parent(nodeA)
 
 nodes = [nodeA, nodeB]
-aBN = network.BeliefNetwork(nodes)
+aBN = network.BeliefNetwork(nodes)              #Nodes must be in topologically sorted order.
 
 samples = [aBN.sample() for x in range(1000)]
 ~~~~
