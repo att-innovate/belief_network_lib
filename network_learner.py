@@ -1,4 +1,4 @@
-
+#   Copyright (c) 2016 AT&T Intellectual Property. All rights reserved.
 #
 #   network_learner.py
 #
