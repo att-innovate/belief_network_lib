@@ -8,8 +8,6 @@ In cases where there is a linear relationship between the variables, an approach
 
 An example of using this library to accomplish this specific application is contained in the Juypter notebook in the 'examples' directory.
 
-# Installation
-
 # Usage
 
 ## Create a network and sample data
