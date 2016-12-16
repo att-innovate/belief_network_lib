@@ -17,8 +17,8 @@ An example of using this library to accomplish this specific application is cont
 ~~~~
 from belief_network_lib import network
 
-nodeA = network.Node([0,1], id="A")
-nodeB = network.Node([0,1], id="B")
+nodeA = network.Node(id="A")
+nodeB = network.Node(id="B")
 
 nodeA.cpt = {None: [0.4, 0.6]}   #Node A has no parents, thus the key in the conditional probability table is None
 
@@ -30,7 +30,7 @@ nodeA.add_child(nodeB)
 nodeB.add_parent(nodeA)
 
 nodes = [nodeA, nodeB]
-aBN = network.BeliefNetwork(nodes)
+aBN = network.BeliefNetwork(nodes)              #Nodes must be in topologically sorted order.
 
 samples = [aBN.sample() for x in range(1000)]
 ~~~~
